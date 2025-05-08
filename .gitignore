@@ -172,3 +172,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# The Secret Sauce (Would prefer not to share because the right algorithm requires safeguarding not only for $$ value but to not be influenced by third parties)
+.dotenv
+strategies/
