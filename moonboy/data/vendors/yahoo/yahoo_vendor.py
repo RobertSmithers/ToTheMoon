@@ -2,11 +2,28 @@ import yfinance as yf
 from datetime import datetime
 from typing import Union
 import pandas as pd
+import requests
+import logging
+import os
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+# Configure logging
+logger = logging.getLogger(__name__)
+
+# Disable SSL warnings
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 from ..vendor_interface import SecuritiesVendor
+from moonboy.utils.file_management import get_fname
 
 class YahooFinanceVendor(SecuritiesVendor):
     """Yahoo Finance implementation of the SecuritiesVendor interface."""
+    
+    def __init__(self):
+        """Initialize the vendor with a custom session."""
+        self.session = requests.Session()
+        self.session.verify = False  # Disable SSL verification
+        # yf.pdr_override()  # Override pandas_datareader with yfinance
     
     def get_historical_data(
         self,
@@ -32,7 +49,14 @@ class YahooFinanceVendor(SecuritiesVendor):
         interval = self.standardize_interval(interval)
         start_date, end_date = self.standardize_dates(start_date, end_date)
         
-        # Download data
+        # Check if data exists in cache
+        fname = get_fname(ticker, interval, start_date, end_date)
+        if os.path.exists(fname):
+            logger.info("Loading cached data from %s", fname)
+            return pd.read_csv(fname, index_col=0, parse_dates=True)
+        
+        # Download data if not in cache
+        logger.info("Downloading data for %s from %s to %s with interval %s", ticker, start_date, end_date, interval)
         ticker_obj = yf.Ticker(ticker)
         data = ticker_obj.history(
             start=start_date,
@@ -40,6 +64,8 @@ class YahooFinanceVendor(SecuritiesVendor):
             interval=interval,
             **kwargs
         )
+
+        logger.info("Loaded %d rows of data for %s from %s to %s with interval %s", len(data), ticker, start_date, end_date, interval)
         
         return data
     
