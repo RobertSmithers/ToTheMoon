@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "moonboy"
+version = "0.1.0"
+authors = [
+    { name = "Robert Smithers", email = "" },
+]
+description = "A trading and backtesting framework"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/RobertSmithers/moonboy"
+"Bug Tracker" = "https://github.com/RobertSmithers/moonboy/issues" 
